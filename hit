@@ -1,0 +1,85 @@
+local HITBOX_SIZE = Vector3.new(22.5, 22.5, 22.5)
+local MODIFICACOES = {
+    Transparency = 0.7,
+    Cor = "Really black",
+    Material = "Neon",
+    Colisao = false
+}
+
+-- Sistema de Armazenamento de Estados
+local estadosOriginais = {}
+local modificadorAtivo = false
+
+-- Função para aplicar modificações
+local function aplicarModificacoes(jogador)
+    local character = jogador.Character
+    if not character then return end
+    
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    -- Salva estado original antes de modificar
+    estadosOriginais[jogador] = {
+        Tamanho = hrp.Size,
+        Transparencia = hrp.Transparency,
+        Cor = hrp.BrickColor,
+        Material = hrp.Material,
+        Colisao = hrp.CanCollide
+    }
+
+    -- Aplica novas propriedades
+    hrp.Size = HITBOX_SIZE
+    hrp.Transparency = MODIFICACOES.Transparency
+    hrp.BrickColor = BrickColor.new(MODIFICACOES.Cor)
+    hrp.Material = MODIFICACOES.Material
+    hrp.CanCollide = MODIFICACOES.Colisao
+end
+
+-- Função para restaurar estado original
+local function restaurarOriginal(jogador)
+    local character = jogador.Character
+    if not character or not estadosOriginais[jogador] then return end
+    
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    hrp.Size = estadosOriginais[jogador].Tamanho
+    hrp.Transparency = estadosOriginais[jogador].Transparencia
+    hrp.BrickColor = estadosOriginais[jogador].Cor
+    hrp.Material = estadosOriginais[jogador].Material
+    hrp.CanCollide = estadosOriginais[jogador].Colisao
+    
+    estadosOriginais[jogador] = nil
+end
+
+-- Função principal de toggle
+local function alternarModificador()
+    modificadorAtivo = not modificadorAtivo
+    local mensagem = modificadorAtivo and "Modificador ATIVADO" or "Modificador DESATIVADO"
+    print(mensagem)
+    
+    for _, jogador in pairs(game.Players:GetPlayers()) do
+        if jogador == game.Players.LocalPlayer then continue end
+        
+        if modificadorAtivo then
+            aplicarModificacoes(jogador)
+        else
+            restaurarOriginal(jogador)
+        end
+    end
+end
+
+-- Configuração do Atalho (Alt Esquerdo)
+game:GetService("UserInputService").InputBegan:Connect(function(entrada)
+    if entrada.KeyCode == Enum.KeyCode.LeftAlt and not entrada.Processed then
+        alternarModificador()
+    end
+end)
+
+-- Inicialização Segura
+game.Players.PlayerAdded:Connect(function(jogador)
+    if modificadorAtivo and jogador ~= game.Players.LocalPlayer then
+        jogador.CharacterAdded:Wait()
+        aplicarModificacoes(jogador)
+    end
+end)
