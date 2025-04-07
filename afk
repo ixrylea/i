@@ -1,0 +1,15 @@
+-- ANTI AFK made by pwsyche [bri]
+ 
+local VirtualUser = game:GetService('VirtualUser')
+ 
+game:GetService('Players').LocalPlayer.Idled:Connect(function()
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
+end)
+ 
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "AntiAFK ativado!",
+    Text = "Feito por bri",
+    Button1 = "Obrigado",
+    Duration = 5
+})
