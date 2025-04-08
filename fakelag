@@ -1,0 +1,28 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local humanoid = character:WaitForChild("Humanoid")
+
+local freezeEnabled = false
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.LeftControl then
+        freezeEnabled = true
+        humanoid.WalkSpeed = 0
+        humanoid.JumpPower = 0
+        humanoidRootPart.Anchored = true -- Impede qualquer movimentação externa
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gameProcessed)
+    if input.KeyCode == Enum.KeyCode.LeftControl then
+        freezeEnabled = false
+        humanoid.WalkSpeed = 16 -- Valor padrão
+        humanoid.JumpPower = 50 -- Valor padrão
+        humanoidRootPart.Anchored = false -- Permite movimentação novamente
+    end
+end)
