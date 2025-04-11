@@ -1,16 +1,41 @@
--- Função pra carregar seu script
+-- Protege contra o script sumir ao morrer e evita execução dupla
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+local carregado = false
+
+-- Função para carregar o script principal
 local function carregarScript()
-    pcall(function()
-        loadstring(game:HttpGet('https://pastefy.app/mJ8vapGJ/raw'))()
-        execute("https://scriptprotector-d6fe7-default-rtdb.firebaseio.com/", "B4SraukVMMsjcGG2rAzqm2m0AkO5mY4bt3PkeNoo", "Script9")
+    if carregado then return end
+    carregado = true
+
+    local success, result = pcall(function()
+        return loadstring(game:HttpGetAsync('https://pastefy.app/mJ8vapGJ/raw'))()
     end)
+    if success then
+        execute("https://scriptprotector-d6fe7-default-rtdb.firebaseio.com/", "B4SraukVMMsjcGG2rAzqm2m0AkO5mY4bt3PkeNoo", "Script9")
+    else
+        warn("Falha ao carregar script:", result)
+    end
 end
 
--- Executa o script na hora
+-- Carrega a primeira vez
 carregarScript()
 
--- Garante que ele continue mesmo depois de morrer e voltar
-game.Players.LocalPlayer.CharacterAdded:Connect(function()
-    task.wait(1)
+-- Recarrega sempre que o personagem for recriado (ex: ao morrer)
+lp.CharacterAdded:Connect(function()
+    carregado = false
+    task.wait(1) -- aguarda o personagem carregar
     carregarScript()
+end)
+
+-- Atualiza a função de jogadores a cada 20 segundos
+task.spawn(function()
+    while true do
+        task.wait(20)
+        pcall(function()
+            if atualizarJogadores then
+                atualizarJogadores()
+            end
+        end)
+    end
 end)
